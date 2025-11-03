@@ -7,7 +7,7 @@ Lab to reserve: https://labondemand.netapp.com/lab/gsafx.
 Once in the lab, you can connect with a terminal to one of the rhel nodes.  
 
 As 'git' is not present, you first need to install it before cloning the repo and launching the setup.  
-Copy and paste the 3 following lines:  
+Copy and paste the following lines:  
 ```bash
 dnf install -y git
 git clone https://github.com/YvosOnTheHub/LabAFX.git
