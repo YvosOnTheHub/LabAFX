@@ -1,0 +1,40 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: bbox
+---
+kind: Pod
+apiVersion: v1
+metadata:
+  name: pod1
+  namespace: bbox
+  labels:
+    app.kubernetes.io/name: test1
+spec:
+  volumes:
+    - name: volume
+      persistentVolumeClaim:
+       claimName: pvc1
+  containers:
+    - name: debugger
+      image: quay.io/yvosonthehub/busybox:1.35.0
+      imagePullPolicy: IfNotPresent
+      command: ['sleep', '3600']
+      volumeMounts:
+        - mountPath: "/data"
+          name: volume
+  nodeSelector:
+    kubernetes.io/os: linux
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: pvc1
+  namespace: bbox
+spec:
+  accessModes:
+  - ReadWriteMany
+  resources:
+    requests:
+      storage: 1Gi
+  storageClassName: sc-nfs
