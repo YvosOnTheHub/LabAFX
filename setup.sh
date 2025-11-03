@@ -75,6 +75,7 @@ echo "###"
 echo "### Check"
 echo "###"
 kubectl get nodes
+sleep 1
 
 echo
 echo "#######################################################################################"
@@ -92,6 +93,7 @@ EOT
 helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
 helm install trident netapp-trident/trident-operator --version 100.2510.0 -n trident --create-namespace -f trident_values.yaml
 
+sleep 5
 frames="/ | \\ -"
 while [ $(kubectl get tver -A | grep trident | awk '{print $3}') != '25.10.0' ];do
     for frame in $frames; do
@@ -110,6 +112,7 @@ echo "### Check"
 echo "###"
 kubectl get -n trident po
 kubectl get tver -A
+sleep 1
 
 echo
 echo "#######################################################################################"
