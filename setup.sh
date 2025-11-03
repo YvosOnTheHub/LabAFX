@@ -101,14 +101,9 @@ EOT
 helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
 helm install trident netapp-trident/trident-operator --version 100.2510.0 -n trident --create-namespace -f trident_values.yaml
 
-sleep 5
-frames="/ | \\ -"
-while [ $(kubectl get tver -A | grep trident | awk '{print $3}') != '25.10.0' ];do
-    for frame in $frames; do
-        sleep 0.5; printf "\rWaiting for Trident to be ready $frame" 
-    done
-done
+sleep 2
 echo
+frames="/ | \\ -"
 while [ $(kubectl get -n trident pod | grep Running | grep -e '1/1' -e '2/2' -e '6/6' | wc -l) -ne 3 ]; do
     for frame in $frames; do
         sleep 0.5; printf "\rWaiting for Trident to be ready $frame" 
