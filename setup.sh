@@ -71,6 +71,14 @@ echo "# Create a KinD cluster"
 echo "#######################################################################################"
 kind create cluster --name afx-k8s
 
+frames="/ | \\ -"
+while [ $(kubectl get nodes | grep NotReady | wc -l) -eq 1 ]
+do
+  for frame in $frames; do
+    sleep 0.5; printf "\rWaiting for Control Plane to be ready $frame" 
+  done
+done
+
 echo "###"
 echo "### Check"
 echo "###"
