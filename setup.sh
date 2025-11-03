@@ -7,19 +7,17 @@ echo
 echo "# This script must be run as root user on the host rhel1 (or rhel2-3-4)"
 echo "####################################################################################"
 
-echo
-echo "####################################################################################"
-echo "# Install tools"
-echo "####################################################################################"
-dnf install -y git
+read -rsp $'Press any key to proceed with the setup\n' -n1 key
 
+echo
 echo "#######################################################################################"
-echo "# Install KinD \(Kubernetes in Docker\)"
+echo "# Install KinD - Kubernetes in Docker"
 echo "#######################################################################################"
 [ $(uname -m) = x86_64 ] && curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.29.0/kind-linux-amd64
 chmod +x ./kind
 mv ./kind /usr/local/bin/kind
 
+echo
 echo "#######################################################################################"
 echo "# Install Helm"
 echo "#######################################################################################"
@@ -27,13 +25,15 @@ wget https://get.helm.sh/helm-v3.15.3-linux-amd64.tar.gz
 tar -xvf helm-v3.15.3-linux-amd64.tar.gz
 cp -f linux-amd64/helm /usr/local/bin/
 
+echo
 echo "#######################################################################################"
-echo "# Deal with SELINUX \& FIREWALL"
+echo "# Deal with SELINUX and FIREWALL"
 echo "#######################################################################################"
 setenforce 0
 sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 systemctl stop firewalld && sudo systemctl disable firewalld
 
+echo
 echo "#######################################################################################"
 echo "# Install Kubectl"
 echo "#######################################################################################"
@@ -50,6 +50,7 @@ EOF
 
 dnf install -y kubectl --disableexcludes=kubernetes
 
+echo
 echo "#######################################################################################"
 echo "# Adding shortcuts to bash"
 echo "#######################################################################################"
@@ -64,6 +65,7 @@ alias trident='tridentctl -n trident'
 EOT
 source ~/.bashrc
 
+echo
 echo "#######################################################################################"
 echo "# Create a KinD cluster"
 echo "#######################################################################################"
@@ -74,10 +76,10 @@ echo "### Check"
 echo "###"
 kubectl get nodes
 
+echo
 echo "#######################################################################################"
 echo "# Install Trident"
 echo "#######################################################################################"
-
 cd
 mkdir -p trident && cd trident
 
@@ -90,12 +92,26 @@ EOT
 helm repo add netapp-trident https://netapp.github.io/trident-helm-chart
 helm install trident netapp-trident/trident-operator --version 100.2510.0 -n trident --create-namespace -f trident_values.yaml
 
+frames="/ | \\ -"
+while [ $(kubectl get tver -A | grep trident | awk '{print $3}') != '25.10.0' ];do
+    for frame in $frames; do
+        sleep 0.5; printf "\rWaiting for Trident to be ready $frame" 
+    done
+done
+echo
+while [ $(kubectl get -n trident pod | grep Running | grep -e '1/1' -e '2/2' -e '6/6' | wc -l) -ne 3 ]; do
+    for frame in $frames; do
+        sleep 0.5; printf "\rWaiting for Trident to be ready $frame" 
+    done
+done
+
 echo "###"
 echo "### Check"
 echo "###"
 kubectl get -n trident po
 kubectl get tver -A
 
+echo
 echo "#######################################################################################"
 echo "# Install Tridentctl"
 echo "#######################################################################################"
@@ -103,6 +119,7 @@ wget https://github.com/NetApp/trident/releases/download/v25.10.0/trident-instal
 tar -xf trident-installer-25.10.0.tar.gz
 mv trident-installer/tridentctl /usr/local/bin/
 
+echo
 echo "#######################################################################################"
 echo "# Install Snapshot Controller"
 echo "#######################################################################################"
@@ -121,11 +138,10 @@ driver: csi.trident.netapp.io
 deletionPolicy: Delete
 EOF
 
-
+echo
 echo "#######################################################################################"
 echo "# Configure Trident backend and storage class"
 echo "#######################################################################################"
-
 cat << EOF > trident_backend.yaml
 apiVersion: v1
 kind: Secret
@@ -171,13 +187,15 @@ EOF
 kubectl create -f storageclass.yaml
 kubectl delete sc standard
 
+echo
 echo "###"
 echo "### Check"
 echo "###"
 kubectl get tbc -n trident
 kubectl get sc
 
-
+echo
+echo
 echo "#######################################################################################"
 echo "# SETUP COMPLETED!"
 echo "#######################################################################################"
