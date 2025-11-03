@@ -69,7 +69,7 @@ echo
 echo "#######################################################################################"
 echo "# Create a KinD cluster"
 echo "#######################################################################################"
-kind create cluster --name afx-k8s
+kind create cluster --name afx-k8s --image kindest/node:v1.33.1
 
 frames="/ | \\ -"
 while [ $(kubectl get nodes | grep NotReady | wc -l) -eq 1 ]
@@ -110,6 +110,7 @@ while [ $(kubectl get -n trident pod | grep Running | grep -e '1/1' -e '2/2' -e 
     done
 done
 
+echo
 echo "###"
 echo "### Check"
 echo "###"
