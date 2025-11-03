@@ -4,7 +4,7 @@ echo
 echo "# AFX Requirements:"
 echo "# Make sure you have gone though the lab guide setup (chapter 2.1.1 - Steps 1 to 20)"
 echo
-echo "# This script must be run as root user on the host rhel1 (or rhel2-3-4)
+echo "# This script must be run as root user on the host rhel1 (or rhel2-3-4)"
 echo "####################################################################################"
 
 echo
@@ -35,7 +35,7 @@ sed -i 's/^SELINUX=enforcing$/SELINUX=permissive/' /etc/selinux/config
 systemctl stop firewalld && sudo systemctl disable firewalld
 
 echo "#######################################################################################"
-echo "# Install Kubectl
+echo "# Install Kubectl"
 echo "#######################################################################################"
 
 cat <<EOF | sudo tee /etc/yum.repos.d/kubernetes.repo
@@ -51,7 +51,7 @@ EOF
 dnf install -y kubectl --disableexcludes=kubernetes
 
 echo "#######################################################################################"
-echo "# Adding shortcuts to bash
+echo "# Adding shortcuts to bash"
 echo "#######################################################################################"
 cat <<EOT >> ~/.bashrc
 alias kc='kubectl create'
@@ -65,7 +65,7 @@ EOT
 source ~/.bashrc
 
 echo "#######################################################################################"
-echo "# Create a KinD cluster
+echo "# Create a KinD cluster"
 echo "#######################################################################################"
 kind create cluster --name afx-k8s
 
